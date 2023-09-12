@@ -9,57 +9,57 @@ import supabase from "../lib/supabase";
 import { User } from "@supabase/supabase-js";
 
 const StudentDashboard = () => {
-  const { toggleSidebar } = useContext(SideContext);
-  const [user, setUser] = useState<User | null>();
-  const [userDetails, setUserDetails] = useState<StudentReg>({
-    full_name: "",
-    email: "",
-    matno: "",
-  });
-  const navigate = useNavigate();
+	const { toggleSidebar } = useContext(SideContext);
+	const [user, setUser] = useState<User | null>();
+	const [userDetails, setUserDetails] = useState<StudentReg>({
+		full_name: "",
+		email: "",
+		matno: "",
+	});
+	const navigate = useNavigate();
 
-  useEffect(() => {
-    async function getUser() {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
+	useEffect(() => {
+		async function getUser() {
+			const {
+				data: { user },
+				error,
+			} = await supabase.auth.getUser();
 
-      setUser(user);
+			setUser(user);
 
-      if (!user) {
-        navigate("/login");
-      } else {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select()
-          .eq("id", user?.id);
+			if (!user) {
+				navigate("/login");
+			} else {
+				const { data, error } = await supabase
+					.from("profiles")
+					.select()
+					.eq("id", user?.id);
 
-        if (data) {
-          setUserDetails(data[0]);
-          console.log(userDetails);
-        } else {
-          console.log(error.message);
-        }
-      }
-    }
+				if (data) {
+					setUserDetails(data[0]);
+					console.log(userDetails);
+				} else {
+					console.log(error.message);
+				}
+			}
+		}
 
-    getUser();
-  }, []);
-  return (
-    <>
-      <div className="">
-        <Sidebar sideBarContent={studentSidebarContent} />
-        <div className="w-[100%] mx-auto overflow-y-auto overflow-x-hidden">
-          <div
-            className={`${toggleSidebar ? "sm:ml-[14rem] " : "sm:ml-[6rem]"}`}
-          >
-            {user && <StudentForm userDetails={userDetails} userId={user?.id} />}
-          </div>
-        </div>
-      </div>
-    </>
-  );
+		getUser();
+	}, []);
+	return (
+		<>
+			<div className="">
+				<Sidebar sideBarContent={studentSidebarContent} />
+				<div className="w-[100%] mx-auto overflow-y-auto overflow-x-hidden">
+					<div
+						className={`${toggleSidebar ? "sm:ml-[14rem] " : "sm:ml-[6rem]"}`}
+					>
+						{user && <StudentForm userDetails={userDetails} userId={user?.id} />}
+					</div>
+				</div>
+			</div>
+		</>
+	);
 };
 
 export default StudentDashboard;

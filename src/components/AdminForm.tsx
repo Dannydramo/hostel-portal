@@ -1,5 +1,7 @@
 import { FormEvent, useState } from 'react'
 import { Input } from "./ui/input";
+import { handleAdminFormUpload } from '../services/adminFor';
+import { Button } from './ui/button';
 interface UserDetails {
 	userDetails: {
 		full_name: string;
@@ -8,6 +10,20 @@ interface UserDetails {
 	},
 	userId: string
 }
+const hostels = [
+	{ name: "Male Hostel A", type: "Male" },
+	{ name: "Male Hostel B", type: "Male" },
+	{ name: "Male Hostel C", type: "Male" },
+	{ name: "Male Hostel D", type: "Male" },
+	{ name: "Male Hostel E", type: "Male" },
+	{ name: "Female Hostel A", type: "Female" },
+	{ name: "Female Hostel B", type: "Female" },
+	{ name: "Female Hostel C", type: "Female" },
+	{ name: "Female Hostel D", type: "Female" },
+	{ name: "Female Hostel E", type: "Female" },
+];
+
+
 const AdminForm = ({ userDetails, userId }: UserDetails) => {
 	console.log(userDetails);
 
@@ -34,11 +50,14 @@ const AdminForm = ({ userDetails, userId }: UserDetails) => {
 			console.log('rghr');
 
 		} else {
-			try {
 
-			} catch (error) {
-
+			const { errorMessage } = await handleAdminFormUpload(adminDetails, userId)
+			if (errorMessage) {
+				return
 			}
+			console.log('Admin Details Uploaded');
+
+
 		}
 
 	}
@@ -53,15 +72,15 @@ const AdminForm = ({ userDetails, userId }: UserDetails) => {
 					<form action="" onSubmit={handleSubmitDetails}>
 						<div className="md:grid w-full md:grid-cols-2 gap-4 md:gap-8 mt-4 flex flex-col">
 							<div className={`w-full h-12 bg-[#ecebf382] text-base `}>
-								<p className='mt-2 ml-2'>{userDetails.full_name}</p>
+								<p className='mt-3 ml-4'>{userDetails.full_name}</p>
 							</div>
 							<div className={`w-full h-12 bg-[#ecebf382] text-base `}>
-								<p className='mt-2 ml-2'>{userDetails.staffid}</p>
+								<p className='mt-3 ml-4'>{userDetails.staffid}</p>
 							</div>
 						</div>
 						<div className="md:grid w-full md:grid-cols-2 gap-4 md:gap-8 mt-4 flex flex-col">
 							<div className={`w-full h-12 bg-[#ecebf382] text-base `}>
-								<p className='mt-2 ml-2'>{userDetails.email}</p>
+								<p className='mt-3 ml-4'>{userDetails.email}</p>
 							</div>
 
 							<Input
@@ -91,6 +110,7 @@ const AdminForm = ({ userDetails, userId }: UserDetails) => {
 								placeholder="Residentail Address"
 							/>
 						</div>
+						<Button className='bg-[#6272B9] text-white mt-4 p-4 text-base w-[300px] flex justify-center text-center'>Submit Form</Button>
 					</form>
 				</div>
 			</div>

@@ -23,8 +23,15 @@ export type UserRegDetails = {
 
 export type AdminReg = UserRegDetails & {
   staffid: string;
+
 };
 
 export type StudentReg = UserRegDetails & {
   matno: string;
 };
+
+export type AdminFormDetails = {
+  phone: string
+  hostelallocated: string
+  address: string
+}
