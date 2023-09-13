@@ -1,6 +1,6 @@
 import { FormEvent, useState } from 'react'
 import { Input } from "./ui/input";
-import { handleAdminFormUpload } from '../services/adminFor';
+import { handleAdminFormUpload } from '../services/adminForm';
 import { Button } from './ui/button';
 interface UserDetails {
 	userDetails: {
@@ -25,7 +25,7 @@ const hostels = [
 
 
 const AdminForm = ({ userDetails, userId }: UserDetails) => {
-	console.log(userDetails);
+
 
 	const [adminDetails, setAdminDetails] = useState({
 		phone: '',

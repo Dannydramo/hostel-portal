@@ -37,7 +37,6 @@ const StudentDashboard = () => {
 
 				if (data) {
 					setUserDetails(data[0]);
-					console.log(userDetails);
 				} else {
 					console.log(error.message);
 				}
