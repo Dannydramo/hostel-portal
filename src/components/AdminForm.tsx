@@ -2,6 +2,19 @@ import { FormEvent, useState } from 'react'
 import { Input } from "./ui/input";
 import { handleAdminFormUpload } from '../services/adminForm';
 import { Button } from './ui/button';
+import { Check, ChevronsUpDown } from "lucide-react"
+import {
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+} from "./ui/command"
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "./ui/popover"
 interface UserDetails {
 	userDetails: {
 		full_name: string;
@@ -26,7 +39,8 @@ const hostels = [
 
 const AdminForm = ({ userDetails, userId }: UserDetails) => {
 
-
+	const [open, setOpen] = useState(false);
+	const [value, setValue] = useState('');
 	const [adminDetails, setAdminDetails] = useState({
 		phone: '',
 		hostelallocated: '',
@@ -51,12 +65,17 @@ const AdminForm = ({ userDetails, userId }: UserDetails) => {
 
 		} else {
 
-			const { errorMessage } = await handleAdminFormUpload(adminDetails, userId)
-			if (errorMessage) {
-				return
-			}
-			console.log('Admin Details Uploaded');
+			try {
+				const { errorMessage } = await handleAdminFormUpload(adminDetails, userId)
+				if (errorMessage) {
+					return
+				}
+				console.log('Admin Details Uploaded');
 
+			} catch (error) {
+				console.log('Error Submitting Admin Details');
+
+			}
 
 		}
 
@@ -93,14 +112,57 @@ const AdminForm = ({ userDetails, userId }: UserDetails) => {
 							/>
 						</div>
 						<div className="md:grid w-full md:grid-cols-2 gap-4 md:gap-8 mt-4 flex flex-col">
-							<Input
-								type="text"
-								name="hostelallocated"
-								value={adminDetails.hostelallocated}
-								className={`w-full h-12 bg-[#ecebf382] text-base `}
-								onChange={handleInputChange}
-								placeholder="Hostel Allocated"
-							/>
+							<Popover open={open} onOpenChange={setOpen}>
+								<PopoverTrigger asChild>
+									<Button
+										variant="outline"
+										role="combobox"
+										aria-expanded={open}
+										className={`w-full h-12 justify-between text-base bg-[#ecebf382]`}
+									>
+										{value
+											? hostels.find(
+												(hostel) => hostel.name === value
+											)?.name
+											: "Select Hostel..."}
+										<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+									</Button>
+								</PopoverTrigger>
+								<PopoverContent className="min-w-[300px] p-0 max-h-[10rem] overflow-y-scroll">
+									<Command>
+										<CommandInput placeholder="Search Hostel..." />
+										<CommandEmpty>No Course found.</CommandEmpty>
+										<CommandGroup>
+											{hostels.map((hostel) => (
+												<CommandItem
+													key={hostel.name}
+													onSelect={(currentValue) => {
+														setValue(
+															currentValue === value ? "" : currentValue
+														);
+														setAdminDetails({
+															...adminDetails,
+															hostelallocated: currentValue
+														})
+														setOpen(false);
+													}}
+												>
+													<Check
+														className={`
+                              										  mr-2 h-4 w-4
+                                										${value === hostel.type
+																? "opacity-100"
+																: "opacity-0"
+															}
+                             								 `}
+													/>
+													{hostel.name}
+												</CommandItem>
+											))}
+										</CommandGroup>
+									</Command>
+								</PopoverContent>
+							</Popover>
 							<Input
 								type="text"
 								name="address"

@@ -6,13 +6,13 @@ interface AuthContextValue {
 		email: string,
 		matno: string,
 		password: string
-	) => {};
+	) => Promise<void>;
 	handleAdminSignup: (
 		fullname: string,
 		email: string,
 		staffid: string,
 		password: string
-	) => {};
+	) => Promise<void>;
 }
 const initialValue = {
 	handleStudentSignup: async () => { },
@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		email: string,
 		matno: string,
 		password: string
-	) => {
+	): Promise<void> => {
 		const {
 			data: { user },
 		} = await supabase.auth.signUp({
@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		email: string,
 		staffid: string,
 		password: string
-	) => {
+	): Promise<void> => {
 		const {
 			data: { user },
 		} = await supabase.auth.signUp({

@@ -61,34 +61,38 @@ const StudentSignup = () => {
 	const handleSignUp = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		const { fullname, email, matno, password } = studentSignUpDetails;
-		try {
-			if (
-				fullname.trim() === "" ||
-				password.trim() === "" ||
-				email.trim() === "" ||
-				matno.trim() === ""
-			) {
-				console.log("Please enter all required fields");
-				setInputValidity((prevState) => ({
-					...prevState,
-					fullName: fullname.trim() === "",
-					password: password.trim() === "",
-					email: email.trim() === "",
-					matno: matno.trim() === "",
-				}));
-			} else {
+
+		if (
+			fullname.trim() === "" ||
+			password.trim() === "" ||
+			email.trim() === "" ||
+			matno.trim() === ""
+		) {
+			console.log("Please enter all required fields");
+			setInputValidity((prevState) => ({
+				...prevState,
+				fullName: fullname.trim() === "",
+				password: password.trim() === "",
+				email: email.trim() === "",
+				matno: matno.trim() === "",
+			}));
+		} else {
+			try {
 				const data = await handleStudentSignup(
 					fullname,
 					email,
 					matno,
 					password
 				);
-				if (data) {
-					console.log(data);
-					navigate("/login");
-				}
+
+				console.log(data);
+				navigate("/login");
+
+			} catch (error) {
+
 			}
-		} catch (error: any) { }
+		}
+
 	};
 
 	return (

@@ -82,11 +82,11 @@ const AdminSignup = () => {
 					staffid,
 					password
 				);
-				if (data) {
-					console.log(data);
 
-					navigate("/login");
-				}
+				console.log(data);
+
+				navigate("/login");
+
 			}
 		} catch (error: any) { }
 	};

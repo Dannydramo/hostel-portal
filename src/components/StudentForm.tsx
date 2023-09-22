@@ -16,7 +16,18 @@ import {
 	PopoverTrigger,
 } from "./ui/popover"
 import { courseNames } from "../lib/courses";
-
+const hostels = [
+	{ name: "Male Hostel A", type: "Male" },
+	{ name: "Male Hostel B", type: "Male" },
+	{ name: "Male Hostel C", type: "Male" },
+	{ name: "Male Hostel D", type: "Male" },
+	{ name: "Male Hostel E", type: "Male" },
+	{ name: "Female Hostel A", type: "Female" },
+	{ name: "Female Hostel B", type: "Female" },
+	{ name: "Female Hostel C", type: "Female" },
+	{ name: "Female Hostel D", type: "Female" },
+	{ name: "Female Hostel E", type: "Female" },
+];
 interface UserDetails {
 	userDetails: {
 		full_name: string;
@@ -25,12 +36,35 @@ interface UserDetails {
 	},
 	userId: string
 }
+
+interface StudentDetails {
+	phone: string;
+	yearOfEntry: string;
+	yearOfGraduation: string;
+	parentName: string;
+	parentsNo: string;
+	address: string;
+	level: string;
+	hostelName: string;
+	gender: string;
+	hasAllergyOrDisability: string;
+	department: string;
+	// Add specific types for each file field
+	accommodationClearance: File | null;
+	schoolFeesReceipt: File | null;
+	passportPhotograph: File | null;
+	accommodationUndertaking: File | null;
+	hostelFeeReceipt: File | null;
+}
+
+
+
 const StudentForm = ({ userDetails, userId }: UserDetails) => {
-	const [open, setOpen] = useState(false)
-	const [value, setValue] = useState("")
+	const [openVal, setOpenVal] = useState(false);
+	const [valueVal, setValueVal] = useState('');
 	const uniqueCourses = courseNames.slice(0, 100).map(name => ({ name, value: name }));
 
-	const [studentDetails, setStudentDetails] = useState({
+	const [studentDetails, setStudentDetails] = useState<StudentDetails>({
 		phone: '',
 		yearOfEntry: '',
 		yearOfGraduation: '',
@@ -41,9 +75,17 @@ const StudentForm = ({ userDetails, userId }: UserDetails) => {
 		hostelName: '',
 		gender: '',
 		hasAllergyOrDisability: '',
-		department: ''
+		department: '',
+		accommodationClearance: null,
+		schoolFeesReceipt: null,
+		passportPhotograph: null,
+		accommodationUndertaking: null,
+		hostelFeeReceipt: null,
 	});
 
+	const [isValid, setIsValid] = useState(false);
+	const [open, setOpen] = useState(false);
+	const [value, setValue] = useState('');
 	const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
 		setStudentDetails((prevState) => ({
@@ -52,12 +94,56 @@ const StudentForm = ({ userDetails, userId }: UserDetails) => {
 		}));
 	};
 
+	const handleFileChange = (e: ChangeEvent<HTMLInputElement>, fieldName: keyof StudentDetails) => {
+		const file = e.target.files && e.target.files[0];
+		setStudentDetails((prevState) => ({
+			...prevState,
+			[fieldName]: file,
+		}));
+	};
+
 	const handleSubmitDetails = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		// Validate form fields here if needed
+		// Check if all required fields are filled
+		const requiredFields: (keyof StudentDetails)[] = [
+			'phone',
+			'yearOfEntry',
+			'yearOfGraduation',
+			'parentName',
+			'parentsNo',
+			'address',
+			'level',
+			'hostelName',
+			'gender',
+			'hasAllergyOrDisability',
+			'department',
+		];
 
-		// Handle form submission here, e.g., send data to the server
+		for (const field of requiredFields) {
+			if (!studentDetails[field]) {
+				alert(`Please fill in the ${field} field.`);
+				return;
+			}
+		}
+
+		// Check if all files are selected
+		const fileFields: (keyof StudentDetails)[] = [
+			'accommodationClearance',
+			'schoolFeesReceipt',
+			'passportPhotograph',
+			'accommodationUndertaking',
+			'hostelFeeReceipt',
+		];
+
+		for (const field of fileFields) {
+			if (!studentDetails[field]) {
+				alert(`Please upload ${field.replace(/([A-Z])/g, ' $1')}.`);
+				return;
+			}
+		}
+
+		// If all validation passes, submit the form
 		console.log('Submitting student details:', studentDetails);
 	};
 
@@ -192,13 +278,57 @@ const StudentForm = ({ userDetails, userId }: UserDetails) => {
 								placeholder="Level"
 								onChange={handleInputChange}
 							/>
-							<Input
-								type="text"
-								name="hostelName"
-								className={`w-full h-12 bg-[#ecebf382] text-base `}
-								placeholder="Hostel Name"
-								onChange={handleInputChange}
-							/>
+							<Popover open={openVal} onOpenChange={setOpenVal}>
+								<PopoverTrigger asChild>
+									<Button
+										variant="outline"
+										role="combobox"
+										aria-expanded={openVal}
+										className={`w-full h-12 justify-between text-base bg-[#ecebf382]`}
+									>
+										{valueVal
+											? hostels.find(
+												(hostel) => hostel.name === valueVal
+											)?.name
+											: "Select Hostel..."}
+										<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+									</Button>
+								</PopoverTrigger>
+								<PopoverContent className="min-w-[300px] p-0 max-h-[10rem] overflow-y-scroll">
+									<Command>
+										<CommandInput placeholder="Search Hostel..." />
+										<CommandEmpty>No Course found.</CommandEmpty>
+										<CommandGroup>
+											{hostels.map((hostel) => (
+												<CommandItem
+													key={hostel.name}
+													onSelect={(currentValue) => {
+														setValue(
+															currentValue === valueVal ? "" : currentValue
+														);
+														setStudentDetails({
+															...studentDetails,
+															hostelName: currentValue
+														})
+														setOpenVal(false);
+													}}
+												>
+													<Check
+														className={`
+                              										  mr-2 h-4 w-4
+                                										${valueVal === hostel.type
+																? "opacity-100"
+																: "opacity-0"
+															}
+                             								 `}
+													/>
+													{hostel.name}
+												</CommandItem>
+											))}
+										</CommandGroup>
+									</Command>
+								</PopoverContent>
+							</Popover>
 						</div>
 
 						<div className="">
@@ -279,8 +409,7 @@ const StudentForm = ({ userDetails, userId }: UserDetails) => {
 									type="file"
 									className="w-full h-full absolute cursor-pointer bottom-0 right-0 z-12 opacity-0"
 									accept="image/jpg, image/png"
-									multiple
-								// onChange={(e) => uploadImage(e)}
+									onChange={(e) => handleFileChange(e, 'accommodationClearance')}
 								/>
 							</div>
 							<div className="relative">
@@ -297,8 +426,8 @@ const StudentForm = ({ userDetails, userId }: UserDetails) => {
 									type="file"
 									className="w-full h-full absolute cursor-pointer bottom-0 right-0 z-12 opacity-0"
 									accept="image/jpg, image/png"
-									multiple
-								// onChange={(e) => uploadImage(e)}
+
+									onChange={(e) => handleFileChange(e, 'schoolFeesReceipt')}
 								/>
 							</div>
 
@@ -311,13 +440,14 @@ const StudentForm = ({ userDetails, userId }: UserDetails) => {
 									<div className="">
 										<p>Upload a passport photograph</p>
 									</div>
+
+
 								</div>
 								<Input
 									type="file"
 									className="w-full h-full absolute cursor-pointer bottom-0 right-0 z-12 opacity-0"
 									accept="image/jpg, image/png"
-									multiple
-								// onChange={(e) => uploadImage(e)}
+									onChange={(e) => handleFileChange(e, 'passportPhotograph')}
 								/>
 							</div>
 						</div>
@@ -336,8 +466,7 @@ const StudentForm = ({ userDetails, userId }: UserDetails) => {
 									type="file"
 									className="w-full h-full absolute cursor-pointer bottom-0 right-0 z-12 opacity-0"
 									accept="image/jpg, image/png"
-									multiple
-								// onChange={(e) => uploadImage(e)}
+									onChange={(e) => handleFileChange(e, 'accommodationUndertaking')}
 								/>
 							</div>
 							<div className="relative">
@@ -354,10 +483,11 @@ const StudentForm = ({ userDetails, userId }: UserDetails) => {
 									type="file"
 									className="w-full h-full absolute cursor-pointer bottom-0 right-0 z-12 opacity-0"
 									accept="image/jpg, image/png"
-									multiple
-								// onChange={(e) => uploadImage(e)}
+									onChange={(e) => handleFileChange(e, 'hostelFeeReceipt')}
 								/>
 							</div>
+
+
 
 
 						</div>

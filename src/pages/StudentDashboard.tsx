@@ -51,7 +51,7 @@ const StudentDashboard = () => {
 				<Sidebar sideBarContent={studentSidebarContent} />
 				<div className="w-[100%] mx-auto overflow-y-auto overflow-x-hidden">
 					<div
-						className={`${toggleSidebar ? "sm:ml-[14rem] " : "sm:ml-[6rem]"}`}
+						className={`${toggleSidebar ? "sm:ml-[14rem] " : "sm:ml-[6rem]"} mb-20`}
 					>
 						{user && <StudentForm userDetails={userDetails} userId={user?.id} />}
 					</div>
